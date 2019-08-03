@@ -1,0 +1,19 @@
+# Binaries
+*.exe
+*.out
+Saga
+
+# Project files
+*.prj
+
+# Directory used to store object files, abc files and assembly files
+Clean System Files/
+
+# Bytecode
+*.bc
+*.pbc
+
+# iTasks environment extra data
+*-data/
+*-www/
+*-sapl/

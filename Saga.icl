@@ -2,9 +2,11 @@ module Saga
 
 import Character
 
-import iTasks
+from Data.Func import $
+from StdFunctions import flip
 import StdBool
 import Text.HTML
+import iTasks
 
 import StdDebug
 
@@ -13,11 +15,6 @@ characters = sharedStore "characters" []
 
 Start :: *World -> *World
 Start world = startEngine (setup >>| loginAndManageWork "Saga" Nothing (Just (Text "Welcome to Saga. Erin's DnD Management System")) False) world
-where
-	worklist :: [Workflow]
-	worklist =
-		[ restrictedTransientWorkflow "Manage users" "Manage users" ["Dungeon Master"] manageUsers
-		]
 
 setup :: Task ()
 setup = createDMIfNonExist >>| installWorkflows worklist
@@ -25,11 +22,8 @@ where
 	worklist =
 		[ restrictedTransientWorkflow "Manage users" "Manage users" ["Dungeon Master"] manageUsers
 		, restrictedTransientWorkflow "View All Characters" "Give a combat centric overview of all characters" ["Dungeon Master"] viewCharacters
-		, transientWorkflow "Characters" "View/Edit all my characters" viewCharacters
+		, transientWorkflow "Characters" "View/Edit all my characters" $ forever editCharacters
 		]
-
-isRole :: User String -> Bool
-isRole (AuthenticatedUser _ roles _) role = isMember role roles
 
 DMTask :: Task ()
 DMTask = editCharacters
@@ -55,7 +49,20 @@ where
 		} @ \_ -> ()
 
 editCharacters :: Task ()
-editCharacters = updateSharedInformation (Title "Characters") [] characters @ \_ -> ()
+editCharacters =
+	    enterChoiceWithShared (Title "Select Character") [ChooseFromGrid snd] (mapRead withIndexes characters)
+	>>*
+		[ OnAction (Action "Edit Character") $ hasValue $ \(i, c) ->
+			    editCharacter c
+			>>* [ OnAction (Action "Save Character") $ hasValue $ \c -> upd (updateAt i c) characters ]
+		, OnAction (Action "New Character") $ always $
+			    editCharacter gDefault{|*|}
+			>>* [ OnAction (Action "Save Character") $ hasValue $ \c -> upd (insertAt 0 c) characters ]
+		]
+	@ \_ -> ()
 
 viewCharacters :: Task ()
 viewCharacters = viewSharedInformation (Title "Characters") [] characters @ \_ -> ()
+
+withIndexes :: ([a] -> [(Int,a)])
+withIndexes = zip2 [0..]

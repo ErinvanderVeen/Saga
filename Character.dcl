@@ -107,4 +107,9 @@ import iTasks
 	, roleplay :: RoleplayStats
 	}
 
+editCharacter :: Character -> Task Character
+toTuple :: Character -> (Characteristics, SkillStats, CombatStats, RoleplayStats)
+fromTuple :: (Characteristics, SkillStats, CombatStats, RoleplayStats) -> Character
+
 derive class iTask Class, Race, Background, Morality, Attitude, Characteristics, AbilityScores, SavingThrows, Skills, Die, DeathSaves, CombatStats, SkillStats, RoleplayCharacteristics, RoleplayStats, Character
+derive gDefault Class, Race, Background, Morality, Attitude, Characteristics, AbilityScores, SavingThrows, Skills, Die, DeathSaves, CombatStats, SkillStats, RoleplayCharacteristics, RoleplayStats, Character

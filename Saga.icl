@@ -1,9 +1,8 @@
 module Saga
 
-import Character
+import Saga.Character
 
 from Data.Func import $
-from StdFunctions import flip
 import StdBool
 import Text.HTML
 import iTasks

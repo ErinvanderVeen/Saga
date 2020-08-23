@@ -1,4 +1,4 @@
-definition module Character
+definition module Saga.Character
 
 import StdBool
 import StdInt

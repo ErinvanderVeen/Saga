@@ -1,4 +1,4 @@
-implementation module Character
+implementation module Saga.Character
 
 import iTasks
 

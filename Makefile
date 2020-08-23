@@ -2,4 +2,4 @@ saga:
 	cpm make
 
 run: saga
-	./Saga
+	./Saga.out

@@ -14,10 +14,10 @@ characters :: SimpleSDSLens [Character]
 characters = sharedStore "characters" []
 
 Start :: *World -> *World
-Start world = startEngine (setup >>| loginAndManageWork "Saga" Nothing (Just (Text "Welcome to Saga. Erin's DnD Management System")) False) world
+Start world = startEngine (setup >-| loginAndManageWork "Saga" Nothing (Just (Text "Welcome to Saga. Erin's DnD Management System")) False) world
 
 setup :: Task ()
-setup = createDMIfNonExist >>| installWorkflows worklist
+setup = createDMIfNonExist >-| installWorkflows worklist
 where
 	worklist =
 		[ restrictedTransientWorkflow "Manage users" "Manage users" ["Dungeon Master"] manageUsers
@@ -46,23 +46,23 @@ where
 			}
 		, title = Just "Dungeon Master"
 		, roles = ["Dungeon Master"]
-		} @ \_ -> ()
+		} @! ()
 
 editCharacters :: Task ()
 editCharacters =
-	    enterChoiceWithShared (Title "Select Character") [ChooseFromGrid snd] (mapRead withIndexes characters)
+	    enterChoiceWithShared [ChooseFromGrid snd] (mapRead withIndexes characters) <<@ Title "Select Character"
 	>>*
 		[ OnAction (Action "Edit Character") $ hasValue $ \(i, c) ->
-			    editCharacter c
+			    updateInformation [] c
 			>>* [ OnAction (Action "Save Character") $ hasValue $ \c -> upd (updateAt i c) characters ]
 		, OnAction (Action "New Character") $ always $
-			    editCharacter gDefault{|*|}
+			    enterInformation []
 			>>* [ OnAction (Action "Save Character") $ hasValue $ \c -> upd (insertAt 0 c) characters ]
 		]
 	@ \_ -> ()
 
 viewCharacters :: Task ()
-viewCharacters = viewSharedInformation (Title "Characters") [] characters @ \_ -> ()
+viewCharacters = viewSharedInformation [] characters <<@ Title "Characters"  @! ()
 
 withIndexes :: ([a] -> [(Int,a)])
 withIndexes = zip2 [0..]

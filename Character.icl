@@ -2,16 +2,22 @@ implementation module Character
 
 import iTasks
 
-editCharacter :: Character -> Task Character
-editCharacter c = updateInformation (Title "Test") [UpdateUsing toTuple (const fromTuple) characterEditor] c
+gEditor{|Character|} = bijectEditorValue toTuple fromTuple characterEditor
 where
-	characterEditor = tabset4 gEditor{|*|} gEditor{|*|} gEditor{|*|} gEditor{|*|}
+	characterEditor = tabset4
+		(gEditor{|*|} <<@ Title "Characteristics")
+		(gEditor{|*|} <<@ Title "Skills")
+		(gEditor{|*|} <<@ Title "Combat")
+		(gEditor{|*|} <<@ Title "Roleplay")
 
-toTuple :: Character -> (Characteristics, SkillStats, CombatStats, RoleplayStats)
-toTuple {characteristics, skills, combat, roleplay} = (characteristics, skills, combat, roleplay)
+	toTuple :: Character -> (Characteristics, SkillStats, CombatStats, RoleplayStats)
+	toTuple {characteristics, skills, combat, roleplay} = (characteristics, skills, combat, roleplay)
 
-fromTuple :: (Characteristics, SkillStats, CombatStats, RoleplayStats) -> Character
-fromTuple (ch, s, c, r) = {Character | characteristics = ch, skills = s, combat = c, roleplay = r}
+	fromTuple :: (Characteristics, SkillStats, CombatStats, RoleplayStats) -> Character
+	fromTuple (ch, s, c, r) = {Character | characteristics = ch, skills = s, combat = c, roleplay = r}
 
-derive class iTask Class, Race, Background, Morality, Attitude, Characteristics, AbilityScores, SavingThrows, Skills, Die, DeathSaves, CombatStats, SkillStats, RoleplayCharacteristics, RoleplayStats, Character
-derive gDefault Class, Race, Background, Morality, Attitude, Characteristics, AbilityScores, SavingThrows, Skills, Die, DeathSaves, CombatStats, SkillStats, RoleplayCharacteristics, RoleplayStats, Character
+derive gEditor Class, Race, Background, Morality, Attitude, Characteristics, AbilityScores, SavingThrows, Skills, Die, DeathSaves, CombatStats, SkillStats, RoleplayCharacteristics, RoleplayStats
+derive gText Class, Race, Background, Morality, Attitude, Characteristics, AbilityScores, SavingThrows, Skills, Die, DeathSaves, CombatStats, SkillStats, RoleplayCharacteristics, RoleplayStats, Character
+derive JSONEncode Class, Race, Background, Morality, Attitude, Characteristics, AbilityScores, SavingThrows, Skills, Die, DeathSaves, CombatStats, SkillStats, RoleplayCharacteristics, RoleplayStats, Character
+derive JSONDecode Class, Race, Background, Morality, Attitude, Characteristics, AbilityScores, SavingThrows, Skills, Die, DeathSaves, CombatStats, SkillStats, RoleplayCharacteristics, RoleplayStats, Character
+derive gEq Class, Race, Background, Morality, Attitude, Characteristics, AbilityScores, SavingThrows, Skills, Die, DeathSaves, CombatStats, SkillStats, RoleplayCharacteristics, RoleplayStats, Character
